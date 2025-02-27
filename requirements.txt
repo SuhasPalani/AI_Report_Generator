@@ -3,3 +3,4 @@ python-docx
 Pillow
 openai
 python-dotenv
+mistralai
