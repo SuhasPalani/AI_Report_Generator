@@ -2,6 +2,8 @@ import streamlit as st
 import time
 from report_generator import generate_report
 
+openai_api_key = st.secrets["OPENAI_API_KEY"]
+mistral_api_key = st.secrets["MISTRAL_API_KEY"]
 
 def measure_execution_time(func):
     def wrapper(*args, **kwargs):
