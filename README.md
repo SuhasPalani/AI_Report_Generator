@@ -1,7 +1,4 @@
-Certainly! Here's a README.md file for your project:
-
-```markdown
-# AI-Powered Report Generator
+# AI Report Generator
 
 ## Description
 This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mistral AI to create customized reports based on user input. It features a Streamlit interface for easy interaction, allows for custom styling, and includes image integration with AI-generated captions.
