@@ -16,8 +16,8 @@ This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mist
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/ai-report-generator.git
-   cd ai-report-generator
+   git clone https://github.com/SuhasPalani/AI_Report_Generator
+   cd directory_name
    ```
 
 2. Create a virtual environment:
