@@ -1,0 +1,6 @@
+streamlit 
+google-cloud-aiplatform
+python-docx 
+Pillow
+openai
+python-dotenv
