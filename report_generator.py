@@ -8,6 +8,8 @@ from docx.enum.style import WD_STYLE_TYPE
 from PIL import Image
 import io
 from dotenv import load_dotenv
+import re
+import ast
 
 load_dotenv()
 
@@ -155,3 +157,99 @@ def save_document(doc):
     doc.save(doc_stream)
     doc_stream.seek(0)
     return doc_stream
+
+
+def analyze_code_blocks(code_blocks):
+    """
+    Analyze a list of code blocks to identify functions, classes, and their relationships.
+    Returns structured data that can be used to generate architecture diagrams.
+    """
+    analysis_results = []
+    
+    for i, block in enumerate(code_blocks):
+        block_analysis = {
+            "id": f"block_{i}",
+            "type": "unknown",
+            "name": f"Block {i+1}",
+            "functions": [],
+            "classes": [],
+            "imports": [],
+        }
+        
+        # Extract functions and classes using regex
+        function_matches = re.findall(r"def\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*\(", block)
+        class_matches = re.findall(r"class\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*[:\(]", block)
+        import_matches = re.findall(r"(?:import|from)\s+([a-zA-Z_][a-zA-Z0-9_\.]*)", block)
+        
+        if function_matches:
+            block_analysis["functions"] = function_matches
+            block_analysis["type"] = "function_container"
+        
+        if class_matches:
+            block_analysis["classes"] = class_matches
+            block_analysis["type"] = "class_container"
+            
+        if import_matches:
+            block_analysis["imports"] = import_matches
+        
+        # Try to give it a meaningful name
+        if function_matches:
+            block_analysis["name"] = function_matches[0]
+        elif class_matches:
+            block_analysis["name"] = class_matches[0]
+        else:
+            # Use first non-empty line as name
+            lines = [line for line in block.split("\n") if line.strip()]
+            if lines:
+                block_analysis["name"] = lines[0][:30] + ("..." if len(lines[0]) > 30 else "")
+        
+        analysis_results.append(block_analysis)
+    
+    return analysis_results
+
+
+def generate_advanced_mermaid(code_blocks):
+    """
+    Generate a more sophisticated Mermaid diagram from code blocks,
+    identifying functions, classes, and their relationships.
+    """
+    analysis = analyze_code_blocks(code_blocks)
+    
+    mermaid_code = "flowchart TD\n"
+    
+    # Add nodes
+    for block in analysis:
+        node_id = block["id"]
+        node_name = block["name"]
+        
+        # Style nodes based on type
+        if block["type"] == "function_container":
+            mermaid_code += f"    {node_id}[\"🔧 {node_name}()\"]\n"
+        elif block["type"] == "class_container":
+            mermaid_code += f"    {node_id}[\"📦 class {node_name}\"]\n"
+        else:
+            mermaid_code += f"    {node_id}[\"{node_name}\"]\n"
+        
+        # Add subgraphs for functions and classes if there are multiple
+        if len(block["functions"]) > 1 or len(block["classes"]) > 1:
+            mermaid_code += f"    subgraph {node_id}_content\n"
+            
+            for func in block["functions"]:
+                func_id = f"{node_id}_{func}"
+                mermaid_code += f"        {func_id}([\"function {func}\"])\n"
+                mermaid_code += f"        {node_id} --> {func_id}\n"
+                
+            for cls in block["classes"]:
+                cls_id = f"{node_id}_{cls}"
+                mermaid_code += f"        {cls_id}([\"class {cls}\"])\n"
+                mermaid_code += f"        {node_id} --> {cls_id}\n"
+                
+            mermaid_code += "    end\n"
+    
+    # Add connections (sequential flow)
+    for i in range(len(analysis) - 1):
+        current_id = analysis[i]["id"]
+        next_id = analysis[i+1]["id"]
+        mermaid_code += f"    {current_id} --> {next_id}\n"
+    
+    return mermaid_code
