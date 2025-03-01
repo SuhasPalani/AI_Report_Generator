@@ -1,7 +1,8 @@
+
 # AI Report Generator
 
 ## Description
-This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mistral AI to create customized reports based on user input. It features a Streamlit interface for easy interaction, allows for custom styling, and includes image integration with AI-generated captions.
+This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mistral AI to create customized reports based on user input. It features a Streamlit interface for easy interaction, allows for custom styling, and includes image integration with AI-generated captions. Additionally, it now includes the ability to generate architecture diagrams based on Python code, providing a visual representation of the code structure and its relationships.
 
 ## Features
 - Dynamic report generation based on user-defined sections
@@ -11,6 +12,7 @@ This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mist
 - Content enhancement using Mistral AI to meet word count requirements
 - Automatic table of contents generation
 - Citation and reference management
+- **Architecture Diagram Generation:** Automatically generates a visual flowchart/architecture diagram from Python code blocks to showcase module relationships, function calls, and class structures.
 
 ## Installation
 
@@ -55,6 +57,7 @@ This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mist
    - Set word limits
    - Choose styling options
    - Add citations
+   - **Generate Architecture Diagram:** Optionally, provide Python code blocks to generate an architecture diagram for your project.
 
 4. Click "Generate Report" to create your customized report.
 
@@ -63,7 +66,7 @@ This project is an AI-powered report generator that uses OpenAI's GPT-4 and Mist
 ## File Structure
 - `app.py`: Main Streamlit application
 - `report_generator.py`: Core logic for report generation
+- `architecture.py`: Logic for analyzing Python code and generating architecture diagrams
 - `requirements.txt`: List of Python dependencies
 - `.env`: Environment variables (API keys)
-
 
