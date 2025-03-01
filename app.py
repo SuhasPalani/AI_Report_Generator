@@ -6,6 +6,7 @@ from improved_code_analysis import generate_detailed_mermaid, analyze_python_cod
 # openai_api_key = st.secrets["OPENAI_API_KEY"]
 # mistral_api_key = st.secrets["MISTRAL_API_KEY"]
 
+
 def measure_execution_time(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -25,10 +26,10 @@ def generate_report_with_timing(*args, **kwargs):
 
 def main():
     st.title("AI Report & Architecture Generator")
-    
+
     # Add tabs for different functionalities
     tab1, tab2 = st.tabs(["Generate Report", "Generate Architecture Diagram"])
-    
+
     with tab1:
         # Original Report Generation functionality
         # Project Name
@@ -58,7 +59,9 @@ def main():
         st.header("Section Descriptions")
         section_descriptions = {}
         for section in sections:
-            section_descriptions[section] = st.text_area(f"Brief description for {section}")
+            section_descriptions[section] = st.text_area(
+                f"Brief description for {section}"
+            )
 
         # Set word limit
         total_word_limit = st.number_input(
@@ -106,8 +109,10 @@ def main():
                     mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                 )
             else:
-                st.error("Please fill in all required fields, including the project name.")
-    
+                st.error(
+                    "Please fill in all required fields, including the project name."
+                )
+
     with tab2:
         # Improved Architecture Diagram Generator
         st.header("Code Architecture Diagram Generator")
@@ -115,80 +120,94 @@ def main():
         Paste your Python code blocks below, and we'll generate a detailed architecture diagram showing functions, 
         classes, and their relationships. Each block can be a separate file or code section.
         """)
-        
+
         # Container for code blocks
         code_blocks = []
-        
+
         # Files/modules option
-        num_blocks = st.number_input("Number of code blocks/files", min_value=1, value=2, step=1)
-        
+        num_blocks = st.number_input(
+            "Number of code blocks/files", min_value=1, value=2, step=1
+        )
+
         for i in range(num_blocks):
             # Allow the user to provide a filename
             col1, col2 = st.columns([1, 5])
             with col1:
-                filename = st.text_input(f"File {i+1} name (optional)", key=f"filename_{i}", placeholder="e.g. app.py")
-            
+                filename = st.text_input(
+                    f"File {i + 1} name (optional)",
+                    key=f"filename_{i}",
+                    placeholder="e.g. app.py",
+                )
+
             with col2:
                 code_block = st.text_area(
-                    f"Code Block {i+1}", 
-                    height=200, 
+                    f"Code Block {i + 1}",
+                    height=200,
                     key=f"block_{i}",
-                    placeholder="Paste your Python code here..."
+                    placeholder="Paste your Python code here...",
                 )
-            
+
             if code_block.strip():
                 # Add filename as a comment if provided
                 if filename and not code_block.startswith(f"# {filename}"):
                     code_block = f"# {filename}\n{code_block}"
                 code_blocks.append(code_block)
-        
+
         # Diagram generation options
         st.subheader("Diagram Options")
-        
+
         col1, col2 = st.columns(2)
         with col1:
-            show_details = st.checkbox("Show detailed class and function information", value=True)
+            show_details = st.checkbox(
+                "Show detailed class and function information", value=True
+            )
         with col2:
             layout_direction = st.selectbox(
-                "Diagram direction", 
+                "Diagram direction",
                 options=["Top to Bottom (TD)", "Left to Right (LR)"],
-                index=0
+                index=0,
             )
-        
+
         if st.button("Generate Architecture Diagram"):
             if code_blocks:
                 with st.spinner("Analyzing code and generating diagram..."):
                     # Replace TD with LR if needed
-                    direction = "TD" if layout_direction == "Top to Bottom (TD)" else "LR"
-                    
+                    direction = (
+                        "TD" if layout_direction == "Top to Bottom (TD)" else "LR"
+                    )
+
                     try:
                         # Generate the detailed mermaid diagram
                         mermaid_code = generate_detailed_mermaid(code_blocks)
-                        
+
                         # Replace the direction if needed
                         if direction == "LR":
-                            mermaid_code = mermaid_code.replace("flowchart TD", "flowchart LR")
-                        
+                            mermaid_code = mermaid_code.replace(
+                                "flowchart TD", "flowchart LR"
+                            )
+
                         # Display the code analysis results
                         modules = analyze_python_code(code_blocks)
-                        
+
                         # Success message
                         st.success("Architecture diagram generated successfully!")
-                        
+
                         # Display the diagram
                         st.subheader("Architecture Diagram")
                         st.markdown(f"```mermaid\n{mermaid_code}\n```")
-                        
+
                         # Show code structure analysis
                         with st.expander("View Code Structure Analysis"):
                             for i, module in enumerate(modules):
-                                st.write(f"**Module {i+1}: {module['main_name']}**")
-                                
+                                st.write(f"**Module {i + 1}: {module['main_name']}**")
+
                                 if module["functions"]:
                                     st.write("Functions:")
                                     for func in module["functions"]:
-                                        st.write(f"- {func['name']}({', '.join(func['args'])})")
-                                
+                                        st.write(
+                                            f"- {func['name']}({', '.join(func['args'])})"
+                                        )
+
                                 if module["classes"]:
                                     st.write("Classes:")
                                     for cls in module["classes"]:
@@ -196,9 +215,9 @@ def main():
                                         if cls["methods"]:
                                             for method in cls["methods"]:
                                                 st.write(f"  - {method}()")
-                                
+
                                 st.write("---")
-                        
+
                         # Provide download options
                         st.download_button(
                             label="Download Mermaid Code",
@@ -206,10 +225,12 @@ def main():
                             file_name="architecture_diagram.mmd",
                             mime="text/plain",
                         )
-                        
+
                     except Exception as e:
                         st.error(f"Error generating diagram: {str(e)}")
-                        st.error("Please check your code for syntax errors or try simplifying the code blocks.")
+                        st.error(
+                            "Please check your code for syntax errors or try simplifying the code blocks."
+                        )
             else:
                 st.error("Please add at least one code block to generate a diagram.")
 
