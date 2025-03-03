@@ -1,4 +1,3 @@
-
 # AI Report Generator
 
 ## Description
